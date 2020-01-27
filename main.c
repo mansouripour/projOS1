@@ -5,6 +5,11 @@
 #include "mmu.h"
 #include "proc.h"
 #include "x86.h"
+#include "user.h"
+
+#define NCHILD 10
+
+
 
 static void startothers(void);
 static void mpmain(void)  __attribute__((noreturn));
@@ -35,6 +40,41 @@ main(void)
   kinit2(P2V(4*1024*1024), P2V(PHYSTOP)); // must come after startothers()
   userinit();      // first user process
   mpmain();        // finish this processor's setup
+  
+  //////////////////////////////////////////////////////////////////////////////
+  int pid;
+  ticketlockinit();
+  
+  pid = fork();
+  for (int i = 1; i< NCHILD; i++)
+  {
+      if(pid < 0)
+      {
+          printf(1,"fork failed\n");
+          exit();
+      }else if(pid > 0)
+        pid = fork();
+  }
+  if(pid < 0)
+  {
+      printf(1,"fork failed\n");
+      exit();
+  }
+  else if(pid == 0)
+  {
+      printf(1,"child adding to shared counter\n");
+      ticketlocktest();
+  }
+  else
+  {
+      for (int i = 0; i< NCHILD; i++)
+        wait();
+      printf(1,"user program finished\n");
+      printf(2,"ticket lock value : %d\n", ticketlocktest()-1 );
+  }
+  //exit();
+}
+////////////////////////////////////////////////////////////////////////////////
 }
 
 // Other CPUs jump here from entryother.S.
