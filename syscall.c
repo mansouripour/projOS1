@@ -105,7 +105,8 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_ticketlockInit(void);
 extern int sys_ticketlockTest(void);
-
+extern int sys_rwinit(void);
+extern int sys_rwtest(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -131,6 +132,8 @@ static int (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_ticketlockInit]    sys_ticketlockInit,
 [SYS_ticketlockTest]    sys_ticketlockTest,
+[SYS_rwinit]   sys_rwinit,
+[SYS_rwtest]   sys_rwtest,
 };
 
 void
