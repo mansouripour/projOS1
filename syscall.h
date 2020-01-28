@@ -22,3 +22,5 @@
 #define SYS_close  21
 #define SYS_ticketlockInit 22
 #define SYS_ticketlockTest 23
+#difine SYS_rwinit 24
+#difine SYS_rwtest 25
