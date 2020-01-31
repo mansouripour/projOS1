@@ -120,6 +120,11 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+void            initTicketlock(struct ticketlock*);
+void            acquireTicketlock(struct ticketlock*);
+void            releaseTicketlock(struct ticketlock*);
+void            ticketlockInit(void);
+void            ticketlockTest(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
