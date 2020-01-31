@@ -17,6 +17,11 @@ initlock(struct spinlock *lk, char *name)
   lk->cpu = 0;
 }
 
+void initTicketlock(struct ticketlock *tlk){
+  tlk->ticket = 0;
+  tlk->turn = 0;
+}
+
 // Acquire the lock.
 // Loops (spins) until the lock is acquired.
 // Holding a lock for a long time may cause
@@ -42,6 +47,24 @@ acquire(struct spinlock *lk)
   getcallerpcs(&lk, lk->pcs);
 }
 
+void acquireTicketlock(struct ticketlock *ltk){
+
+  int ticket;
+  if(holdingTicket(ltk))
+    panic("acquire");
+
+  my_ticket = fetch_and_add(ltk->ticket,1);
+
+  while(my_ticket != ltk->turn); //loops until its turn arrives
+
+  ltk->cpu = mycpu();
+  ltk->proc = myproc();
+
+  ltk->turn++; //nextTicket number
+  getcallerpcs(&ltk, ltk->pcs);
+
+}
+
 // Release the lock.
 void
 release(struct spinlock *lk)
@@ -65,6 +88,20 @@ release(struct spinlock *lk)
   asm volatile("movl $0, %0" : "+m" (lk->locked) : );
 
   popcli();
+}
+
+void releaseTicketLock(struct ticketlock *ltk)
+{
+  if(!holding_t(ltk))
+    panic("lock is already released");
+
+  ltk->pcs[0] = 0;
+  ltk->cpu = 0;
+  ltk->proc = 0;
+
+  ltk->turn++; //nowServing++ when the lock is released
+  wakeup(ltk);  // Wake up all processes sleeping on ltk
+
 }
 
 // Record the current call stack in pcs[] by following the %ebp chain.
@@ -96,6 +133,10 @@ holding(struct spinlock *lock)
   return r;
 }
 
+int holdingTicket(struct ticketlock *lock)
+{
+  return (lock->ticket != lock->turn);
+}
 
 // Pushcli/popcli are like cli/sti except that they are matched:
 // it takes two popcli to undo two pushcli.  Also, if interrupts
