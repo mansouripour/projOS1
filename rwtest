@@ -1,0 +1,11 @@
+#include "types.h"
+#include "user.h"
+#include NCHILD 10
+
+void testReaderWriters(int* pattern, int pattern_size);
+int main(){
+    char argv[100];
+
+    printf(1, "enter pattern for readers/writers test\n");
+    read_size = 
+}
