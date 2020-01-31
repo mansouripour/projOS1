@@ -6,6 +6,8 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "spinlock.c"
+
 
 struct {
   struct spinlock lock;
@@ -494,6 +496,30 @@ kill(int pid)
   }
   release(&ptable.lock);
   return -1;
+}
+
+void
+givepriority(struct proc *p)
+{
+  acquire(&ptable.lock);
+  if(p->priority < proc->priority) {
+    cprintf("[%d] inherited priority %d from %d\n", p->pid, proc->priority, 
+            proc->pid);
+    p->priority = proc->priority;
+  }
+  release(&ptable.lock);
+}
+
+void
+resetpriority()
+{
+    acquire(&ptable.lock);
+    if (proc->priority != proc->basepriority) {
+      cprintf("[%d] priority restored to %d from inherited %d\n", 
+              proc->pid, proc->basepriority, proc->priority);
+      proc->priority = proc->basepriority;
+    }
+    release(&ptable.lock);
 }
 
 //PAGEBREAK: 36
