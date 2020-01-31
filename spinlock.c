@@ -16,7 +16,7 @@ initlock(struct spinlock *lk, char *name)
   lk->locked = 0;
   lk->cpu = 0;
 }
-
+//*******//
 void initTicketlock(struct ticketlock *tlk){
   tlk->ticket = 0;
   tlk->turn = 0;
@@ -46,7 +46,7 @@ acquire(struct spinlock *lk)
   lk->cpu = mycpu();
   getcallerpcs(&lk, lk->pcs);
 }
-
+//*******//
 void acquireTicketlock(struct ticketlock *ltk){
 
   int ticket;
@@ -89,7 +89,7 @@ release(struct spinlock *lk)
 
   popcli();
 }
-
+//*******//
 void releaseTicketLock(struct ticketlock *ltk)
 {
   if(!holding_t(ltk))
@@ -132,7 +132,7 @@ holding(struct spinlock *lock)
   popcli();
   return r;
 }
-
+//*******//
 int holdingTicket(struct ticketlock *lock)
 {
   return (lock->ticket != lock->turn);
