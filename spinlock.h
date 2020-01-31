@@ -9,3 +9,7 @@ struct spinlock {
                      // that locked the lock.
 };
 
+struct ticketlock {
+ int ticket; //the ticket which the new arrival process will get
+ int turn; //the ticket number which is now being served
+}ticketlock;
